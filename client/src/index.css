@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+/* Text on green buttons stays white in both themes */
+@theme {
+  --color-on-accent: #ffffff;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900;
+}
+
+/*
+  Dark mode: instead of adding dark: classes everywhere, the color tokens the app uses are
+  re-pointed to dark equivalents. Surfaces get darker, text gets lighter, accents keep their hue.
+  <html data-theme="dark"> is set by src/theme.js (from the toggle or the phone's setting).
+*/
+:root[data-theme='dark'] {
+  color-scheme: dark; /* dark inputs, scrollbars and date pickers */
+
+  --color-white: #1e293b; /* cards */
+  --color-slate-50: #0f172a; /* page background */
+  --color-slate-100: #273449;
+  --color-slate-200: #334155;
+  --color-slate-300: #475569;
+  --color-slate-400: #7c8ca3;
+  --color-slate-500: #94a3b8;
+  --color-slate-600: #b4c0d0;
+  --color-slate-700: #cbd5e1;
+  --color-slate-800: #e2e8f0; /* active toggle background (shown inverted) */
+  --color-slate-900: #f1f5f9; /* main text */
+
+  --color-emerald-50: #052e1f;
+  --color-emerald-200: #065f46;
+  --color-emerald-300: #047857;
+  --color-emerald-700: #34d399;
+  --color-emerald-800: #6ee7b7;
+
+  --color-amber-50: #3a2a05;
+  --color-amber-200: #78520f;
+  --color-amber-900: #fde68a;
+
+  --color-red-500: #f87171;
+  --color-red-600: #f87171;
+}

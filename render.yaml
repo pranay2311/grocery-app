@@ -1,0 +1,24 @@
+# Render "Blueprint": one free web service that serves the React app and the API.
+# Secrets (sync: false) are typed into the Render dashboard, never stored here.
+services:
+  - type: web
+    name: grocery-prices
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm run render-build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: AI_PROVIDER
+        value: gemini
+      - key: MONGODB_URI
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
