@@ -10,7 +10,7 @@ One Node service serves the website and the API; Caddy in front provides HTTPS.
    scp -i ~/.ssh/oracle_grocery deploy/server-setup.sh ubuntu@<ip>:/tmp/
    ssh -i ~/.ssh/oracle_grocery ubuntu@<ip> "sudo bash /tmp/server-setup.sh <ip-with-dashes>.sslip.io"
    ```
-4. Put the secrets in `/etc/grocery/env` on the VM (`NODE_ENV=production`, `PORT=5000`, `MONGODB_URI`, `GEMINI_API_KEY`, `AI_PROVIDER=gemini`, a new long random `JWT_SECRET`).
+4. Put the secrets in `/etc/grocery/env` on the VM (`NODE_ENV=production`, `PORT=5000`, `MONGODB_URI`, `GEMINI_API_KEY`, a new long random `JWT_SECRET`).
 5. In MongoDB Atlas → Network Access, add the VM's public IP.
 
 ## Every update

@@ -14,8 +14,6 @@ services:
         value: production
       - key: NODE_VERSION
         value: "22"
-      - key: AI_PROVIDER
-        value: gemini
       - key: MONGODB_URI
         sync: false
       - key: GEMINI_API_KEY
