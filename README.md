@@ -1,3 +1,5 @@
+> 📚 I made this project for learning purposes: to practise full-stack web development and hosting.
+
 # Grocery Prices
 
 Scan German supermarket receipts, store the prices in MongoDB, and find where a product is cheapest.
