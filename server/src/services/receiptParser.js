@@ -1,18 +1,19 @@
 import { loadCatalog, SAME_PRODUCT_RULES } from './productMatching.js'
 import { ReceiptReadError } from './receiptSchema.js'
 
-// Picks the AI provider from AI_PROVIDER in .env: "gemini" (default, free tier) or "claude" (paid).
+// Picks the AI provider from AI_PROVIDER in .env: "gemini" (default, free tier), "claude" (paid) or "lisa" (OpenAI-compatible).
 // Providers are loaded on first use, so only the chosen provider's API key is required.
 const PROVIDERS = {
   gemini: () => import('./providers/gemini.js'),
   claude: () => import('./providers/claude.js'),
+  lisa: () => import('./providers/lisa.js'),
 }
 
 let providerPromise
 
 function loadProvider() {
   const name = (process.env.AI_PROVIDER || 'gemini').toLowerCase()
-  if (!PROVIDERS[name]) throw new Error(`Unknown AI_PROVIDER "${name}". Use "gemini" or "claude".`)
+  if (!PROVIDERS[name]) throw new Error(`Unknown AI_PROVIDER "${name}". Use "gemini", "claude" or "lisa".`)
   providerPromise ??= PROVIDERS[name]().catch((err) => {
     providerPromise = undefined // allow a retry after fixing .env
     throw err

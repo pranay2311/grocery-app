@@ -8,7 +8,8 @@
     "start": "node --env-file-if-exists=.env src/index.js",
     "models": "node --env-file-if-exists=.env scripts/list-gemini-models.js",
     "enrich": "node --env-file-if-exists=.env scripts/enrich-products.js",
-    "merge": "node --env-file-if-exists=.env scripts/merge-duplicates.js"
+    "merge": "node --env-file-if-exists=.env scripts/merge-duplicates.js",
+    "lisa:models": "node --env-file-if-exists=.env scripts/lisa-check.js"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +26,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.12.3",
     "multer": "^2.5.0",
+    "openai": "^7.62.0",
     "zod": "^4.6.7"
   }
 }
