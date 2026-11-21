@@ -9,16 +9,41 @@ const PROVIDERS = {
   lisa: () => import('./providers/lisa.js'),
 }
 
-let providerPromise
+const loaded = new Map()
 
-function loadProvider() {
-  const name = (process.env.AI_PROVIDER || 'gemini').toLowerCase()
-  if (!PROVIDERS[name]) throw new Error(`Unknown AI_PROVIDER "${name}". Use "gemini", "claude" or "lisa".`)
-  providerPromise ??= PROVIDERS[name]().catch((err) => {
-    providerPromise = undefined // allow a retry after fixing .env
-    throw err
-  })
-  return providerPromise
+function loadProvider(name) {
+  if (!PROVIDERS[name]) throw new Error(`Unknown AI provider "${name}". Use "gemini", "claude" or "lisa".`)
+  if (!loaded.has(name)) {
+    loaded.set(
+      name,
+      PROVIDERS[name]().catch((err) => {
+        loaded.delete(name) // allow a retry after fixing .env
+        throw err
+      }),
+    )
+  }
+  return loaded.get(name)
+}
+
+// Main provider, plus an optional backup used when the main one fails or times out.
+// Default backup: Gemini, when the main provider is something else and a Gemini key exists.
+function providerNames() {
+  const main = (process.env.AI_PROVIDER || 'gemini').toLowerCase()
+  const fallback = (process.env.AI_FALLBACK_PROVIDER ?? (main !== 'gemini' && process.env.GEMINI_API_KEY ? 'gemini' : '')).toLowerCase()
+  return fallback && fallback !== 'none' && fallback !== main ? [main, fallback] : [main]
+}
+
+async function readWithFallback(buffer, mediaType, instructions) {
+  const names = providerNames()
+  for (const [i, name] of names.entries()) {
+    try {
+      const provider = await loadProvider(name)
+      return await provider.parseReceiptImage(buffer, mediaType, instructions)
+    } catch (err) {
+      if (i === names.length - 1) throw err
+      console.warn(`Receipt reading with ${name} failed (${err.message}); trying ${names[i + 1]}`)
+    }
+  }
 }
 
 function buildInstructions(catalogText) {
@@ -33,8 +58,8 @@ ${catalogText}`
 }
 
 export async function parseReceiptImage(buffer, mediaType) {
-  const [provider, catalog] = await Promise.all([loadProvider(), loadCatalog()])
-  const receipt = await provider.parseReceiptImage(buffer, mediaType, buildInstructions(catalog.text))
+  const catalog = await loadCatalog()
+  const receipt = await readWithFallback(buffer, mediaType, buildInstructions(catalog.text))
   if (receipt.items.length === 0) {
     throw new ReceiptReadError('No products found on this photo. Is it a supermarket receipt?')
   }

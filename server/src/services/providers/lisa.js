@@ -12,15 +12,13 @@ if (!process.env.LISA_MODEL) {
   throw new Error('LISA_MODEL is not set. Run `npm run lisa:models` to see the available models.')
 }
 
-const client = new OpenAI({ apiKey: process.env.LISA_API_KEY, baseURL: process.env.LISA_BASE_URL, timeout: 120_000 })
+// A shared university server can be slow when busy: give up after 75 s (the app then falls back to Gemini)
+const client = new OpenAI({ apiKey: process.env.LISA_API_KEY, baseURL: process.env.LISA_BASE_URL, timeout: 75_000, maxRetries: 0 })
 const jsonSchema = z.toJSONSchema(ReceiptSchema)
 
-// Not every model behind LISA supports strict JSON schemas, so try that first, then plain JSON mode, then none.
-const FORMATS = [
-  { type: 'json_schema', json_schema: { name: 'receipt', schema: jsonSchema, strict: true } },
-  { type: 'json_object' },
-  null,
-]
+// Plain JSON mode first: strict json_schema mode hung on LISA with long prompts (tested 2026-11-21).
+// The schema is in the system prompt and the answer is validated with zod anyway.
+const FORMATS = [{ type: 'json_object' }, null]
 
 export async function parseReceiptImage(buffer, mediaType, instructions) {
   const messages = [
